@@ -143,6 +143,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="overlay"></div>
 
 <div class="form-login">
+ 
+<style>
+    .mobile-home-btn {
+    display: none; /* Caché par défaut */
+    position: fixed;
+    left: 20px;
+    background-color: #FF5A5F;
+    color: white;
+    padding: 9px 15px;
+    border-radius: 30px;
+    
+    font-weight: bold;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+}
+
+.mobile-home-btn i {
+    margin-right: 8px;
+    font-size: 1.4rem;
+}
+
+.mobile-home-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Afficher uniquement sur mobile */
+@media screen and (max-width: 768px) {
+    .mobile-home-btn {
+        display: flex;
+        align-items: center;
+    }
+}
+
+</style>
+ <a href="index.php" class="mobile-home-btn">
+    <i class="fas fa-home"></i> Accueil
+</a><br><hr>
     <h2 class="text-center mb-4" style="color:#ff5a5f; font-weight: bold;">Connexion à BBLove</h2>
 
     <?php if ($message): ?>
