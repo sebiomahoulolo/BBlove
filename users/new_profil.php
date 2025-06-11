@@ -45,6 +45,9 @@ $getUser = $getUser->fetch();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BBLove - Application Mobile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <style>
         :root {
             --primary: #ff2d55;
@@ -326,6 +329,8 @@ $getUser = $getUser->fetch();
     </style>
     <style>
         /* Styles spécifiques à la page de profil */
+
+   
 
       .profile-header-title {
                 font-weight: 600;
@@ -632,7 +637,7 @@ $getUser = $getUser->fetch();
         <div class="profile-actions">
             <?php if($userId !== $getUserId): ?>
                 <button class="primary-btn"><i class="fas fa-user-plus"></i> Ajouter</button>
-            <button class="secondary-btn"><i class="fas fa-comment-dots"></i> Message</button>
+            <button class="secondary-btn"><i class="fas fa-comment-dots"></i> <a href="chat.php?user_id=<?= $getUserId ?>" style="text-decoration: none; color: var(--dark-color);">Message</a> </button>
             <button class="icon-btn"><i class="fas fa-ellipsis-h"></i></button>
             <?php endif; ?>
         </div>
@@ -675,6 +680,9 @@ $getUser = $getUser->fetch();
                 <h3><i class="fas fa-glass-martini-alt"></i> Alcool</h3>
                 <p><?= htmlspecialchars($getUser['alcool'] ?? 'Non spécifié') ?></p>
             </div>
+            <div class="row">
+                <button class="btn btn-sm btn-danger py-2" onclick="window.location.href='../logout.php'"> <i class="fas fa-sign-out-alt"></i> Se déconnecter</button>
+            </div>
         </div>
 
         <!-- Section Photos -->
@@ -704,18 +712,18 @@ $getUser = $getUser->fetch();
             <i class="fas fa-home"></i>
             <span>Accueil</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="decouvrir.php" class="nav-item">
             <i class="fas fa-search"></i>
             <span>Découvrir</span>
         </a>
         <a href="#" class="nav-item">
-            <i class="fas fa-users"></i>
+            <i class="fa-solid fa-bars"></i>
             <span>Rencontres</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="recuperer_user.php" class="nav-item">
             <i class="fas fa-comment-dots"></i>
             <span>Messages</span>
-            <div class="nav-notification">3</div>
+            <!-- <div class="nav-notification">3</div> -->
         </a>
         <a href="./new_profil.php?user_id=<?=$userId ?>" class="nav-item">
           <i class="fas fa-user"></i>

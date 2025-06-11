@@ -9,24 +9,38 @@ $getUser->execute([$userId]);
 $getUser = $getUser->fetch();
 
 // Vérifier si le formulaire est soumis
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $user_id = $_POST['user_id'];
-    $username = $_POST['username'];
-    $time = $_POST['time'];
-    $content = $_POST['content'];
-    $image = $_POST['image'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $userId = $_SESSION['user_id']; // Assure-toi que l'utilisateur est connecté
+    $content = trim($_POST['content']);
+    $imageName = null;
 
-    // Insertion dans la base de données
-    $stmt = $pdo->prepare("INSERT INTO posts (user_id, username, time, content, image) VALUES (:user_id, :username, :time, :content, :image)");
-    $stmt->execute([
-        'user_id' => $user_id,
-        'username' => $username,
-        'time' => $time,
-        'content' => $content,
-        'image' => $image
-    ]);
+    // Gestion de l'image
+    if (!empty($_FILES['image']['name'])) {
+        $imageTmp = $_FILES['image']['tmp_name'];
+        $imageType = $_FILES['image']['type'];
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
 
-    echo "Post ajouté avec succès !";
+        if (in_array($imageType, $allowedTypes)) {
+            $imageName = time() . '_' . basename($_FILES['image']['name']);
+            $targetPath = '../uploads/' . $imageName;
+            move_uploaded_file($imageTmp, $targetPath);
+        } else {
+            echo "Type d'image non supporté.";
+            exit;
+        }
+    }
+
+    // Enregistrement dans la base de données
+    try {
+        $stmt = $pdo->prepare("INSERT INTO posts (user_id, content, image) VALUES (?, ?, ?)");
+        $stmt->execute([$userId, $content, $imageName]);
+
+        echo "✅ Publication enregistrée avec succès !";
+        // Optionnel : redirection
+        // header("Location: fil_actu.php");
+    } catch (PDOException $e) {
+        echo "❌ Erreur : " . $e->getMessage();
+    }
 }
 
 
@@ -285,6 +299,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <!-- Barre de navigation finale -->
     <nav class="navbar">
         <div class="navbar-title">
+            <a href="./../dashboard.php" class="back-button"><i class="fas fa-arrow-left"></i></a>
             <i class="fas fa-heart"></i>
             <span>BBLove</span>
         </div>
@@ -307,40 +322,53 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- Zone de création de post finale -->
     <div class="create-post-container">
-
-        <div class="post-header">
-            <!-- <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profil" class="user-avatar"> -->
-            <div class="post-input-container">
-                <textarea class="post-input" placeholder="À quoi pensez-vous ?"></textarea>
-                <div class="emoji-picker" title="Émojis">
-                    <i class="far fa-smile"></i>
+        <form action="" method="POST" enctype="multipart/form-data">
+            <div class="post-header">
+                
+                <img src="<?= !empty($getUser['profile_picture']) ? '../uploads/' . $getUser['profile_picture'] : 'https://randomuser.me/api/portraits/women/44.jpg' ?>" alt="Profil" class="user-avatar">
+                <div class="post-input-container">
+                    <textarea name="content" class="post-input" placeholder="À quoi pensez-vous ?" required></textarea>
+                    <div class="emoji-picker" title="Émojis">
+                        <i class="far fa-smile"></i>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="post-options">
-            <div class="options-left">
-                <button class="option photo-option" title="Ajouter une photo">
-                    <i class="fas fa-camera"></i>
-                    <span>Photo</span>
-                </button>
-                <button class="option tag-option" title="Tagger quelqu'un">
-                    <i class="fas fa-user-tag"></i>
-                    <span>Personne</span>
-                </button>
+            
+            <div class="post-options">
+                <div class="options-left">
+                    <label class="option photo-option" title="Ajouter une photo">
+                        <i class="fas fa-camera"></i>
+                        <span>Photo</span>
+                        <input type="file" name="image" accept="image/*" style="display: none;" id="imageInput">
+                    </label>
+                    <!-- <button type="button" class="option tag-option" title="Tagger quelqu'un">
+                        <i class="fas fa-user-tag"></i>
+                        <span>Personne</span>
+                    </button> -->
+                </div>
+                <button type="submit" class="post-button" id="postButton">Publier</button>
             </div>
-            <button class="post-button" id="postButton">Publier</button>
-        </div>
+        </form>
     </div>
 
     <script>
         // Activation dynamique du bouton
         const postInput = document.querySelector('.post-input');
         const postButton = document.getElementById('postButton');
+        const imageInput = document.getElementById('imageInput');
         
         postInput.addEventListener('input', function() {
             const hasContent = this.value.trim() !== '';
             postButton.classList.toggle('enabled', hasContent);
+        });
+        
+        // Gestion de l'upload d'image
+        imageInput.addEventListener('change', function() {
+            if(this.files && this.files[0]) {
+                const fileName = this.files[0].name;
+                const label = this.parentElement;
+                label.querySelector('span').textContent = fileName;
+            }
         });
         
         // Gestion des options
@@ -355,31 +383,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         document.querySelector('.emoji-picker').addEventListener('click', () => {
             alert('Sélecteur d\'émoticônes ouvert');
         });
-        
-        // Publication
-        postButton.addEventListener('click', function() {
-            if (this.classList.contains('enabled')) {
-                const originalText = this.textContent;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                
-                setTimeout(() => {
-                    this.innerHTML = '<i class="fas fa-check"></i> Publié !';
-                    setTimeout(() => {
-                        postInput.value = '';
-                        this.textContent = originalText;
-                        this.classList.remove('enabled');
-                    }, 1000);
-                }, 500);
-            }
-        });
-        
-        // Navigation
-        // document.querySelectorAll('.navbar-icon').forEach(icon => {
-        //     icon.addEventListener('click', function(e) {
-        //         e.preventDefault();
-        //         this.classList.add('active');
-        //     });
-        // });
     </script>
 </body>
 </html>

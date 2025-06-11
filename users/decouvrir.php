@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db.php';
+include '../db.php';
 
 // Vérification de session utilisateur
 if (!isset($_SESSION['user_id'])) {
@@ -47,17 +47,17 @@ $allPosts = $stmt->fetchAll();
 
 
 // Mise à jour de la dernière activité
-    $stmt = $pdo->prepare("UPDATE users SET last_activity = NOW() WHERE id = ?");
-    $stmt->execute([$userId]);
+$stmt = $pdo->prepare("UPDATE users SET last_activity = NOW() WHERE id = ?");
+$stmt->execute([$userId]);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BBLove - Application Mobile</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
         :root {
             --primary: #ff2d55;
             --secondary: #ff7b8b;
@@ -75,7 +75,7 @@ $allPosts = $stmt->fetchAll();
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
         
-    body {
+        body {
             background-color: var(--light);
             color: var(--dark);
             height: 100vh;
@@ -240,8 +240,8 @@ $allPosts = $stmt->fetchAll();
             border-top: 1px solid var(--gray);
             border-bottom: 1px solid var(--gray);
             padding: 8px 0;
-      margin-bottom: 10px;
-    }
+            margin-bottom: 10px;
+        }
         
         .post-action {
             display: flex;
@@ -334,97 +334,184 @@ $allPosts = $stmt->fetchAll();
                 height: 100vh;
                 max-width: 100%;
             }
-}
- </style>
- </head>
+        }
+
+        /* Styles pour la section des utilisateurs */
+        .users-section {
+            padding: 16px;
+            background-color: var(--white);
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin-bottom: 16px;
+            padding-left: 8px;
+        }
+
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .user-card {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+
+        .user-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .user-card-header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-card-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+
+        .user-card-info {
+            flex: 1;
+        }
+
+        .user-card-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .user-card-age {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            margin-bottom: 2px;
+        }
+
+        .user-card-location {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+        }
+
+        .user-card-actions {
+            display: flex;
+            padding: 12px;
+            gap: 8px;
+            border-top: 1px solid var(--gray);
+        }
+
+        .user-card-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn {
+            background-color: var(--light);
+            color: var(--dark);
+        }
+
+        .view-btn:hover {
+            background-color: var(--gray);
+        }
+
+        .chat-btn {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .chat-btn:hover {
+            background-color: var(--secondary);
+        }
+
+        @media (max-width: 500px) {
+            .users-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
 <body>
+     <!-- Barre de navigation supérieure -->
     <!-- Header -->
     <div class="header">
         <div class="logo">
+        <a href="./../dashboard.php" class="back-button"><i class="fas fa-arrow-left"></i></a>
             <i class="fas fa-heart"></i>
             <span>BBLove</span>
         </div>
         <div class="header-icons">
-            <!-- <i class="fas fa-search header-icon"></i> -->
             <i class="fas fa-comment-dots header-icon"></i>
         </div>
     </div>
 
-    <!-- Stories -->
-    <div class="stories">
-        <div class="story">
-            <img src="<?= !empty($currentUser['photo']) ? $currentUser['photo'] : 'https://randomuser.me/api/portraits/women/1.jpg' ?>" alt="Story" class="story-avatar">
-            <div class="story-add">+</div>
-            <div class="story-username"><?= htmlspecialchars($currentUser['nom']) ?></div>
-        </div>
-        <?php foreach($allUsers as $user): ?>
-            <?php if($user['id'] != $userId): ?>
-            <div class="story">
-              <a href="users/new_profil.php?user_id=<?= $user[0] ?>">
-                <img src="<?= !empty($user['photo']) ? $user['photo'] : 'https://randomuser.me/api/portraits/men/1.jpg' ?>" alt="Story" class="story-avatar">
-                <div class="story-username"><?= htmlspecialchars($user['nom']) ?></div>
-              </a>
-            </div>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    </div>
-
-    <!-- Posts -->
-    <div class="posts">
-        <?php foreach($allPosts as $post): ?>
-        <div class="post">
-            <div class="post-header">
-                <div class="post-user">
-                    <img src="<?= !empty($post['photo']) ? $post['photo'] : 'https://randomuser.me/api/portraits/men/1.jpg' ?>" alt="User" class="post-avatar">
-                    <a class="text-decoration-none" href="users/new_profil.php?user_id=<?= $post['user_id'] ?>"><div class="post-info ">
-                        <h4><?= htmlspecialchars($post['nom']) ?></h4>
-                        <p><?= htmlspecialchars($post['age'] ?? '') ?> ans · <?= htmlspecialchars($post['ville'] ?? '') ?></p>
+    <!-- Section des utilisateurs -->
+    <div class="users-section">
+        <h2 class="section-title">Découvrir des personnes</h2>
+        <div class="users-grid">
+            <?php foreach($allUsers as $user): ?>
+                <?php if($user['id'] != $userId): ?>
+                <div class="user-card">
+                    <div class="user-card-header">
+                        <img src="<?= !empty($user['photo']) ? $user['photo'] : 'https://randomuser.me/api/portraits/men/1.jpg' ?>" 
+                             alt="Profil" 
+                             class="user-card-avatar">
+                        <div class="user-card-info">
+                            <h3 class="user-card-name"><?= htmlspecialchars($user['nom']) ?></h3>
+                            <p class="user-card-age"><?= htmlspecialchars($user['age'] ?? '') ?> ans</p>
+                            <p class="user-card-location"><?= htmlspecialchars($user['ville'] ?? '') ?></p>
+                        </div>
                     </div>
-                    </a>
+                    <div class="user-card-actions">
+                        <a href="new_profil.php?user_id=<?= $user[0] ?>" class="user-card-btn view-btn">
+                            <i class="fas fa-user"></i>
+                            <span>Voir profil</span>
+                        </a>
+                        <a href="chat.php?user_id=<?= $user[0] ?>" class="user-card-btn chat-btn">
+                            <i class="fas fa-comment-dots"></i>
+                            <span>Discuter</span>
+                        </a>
+                    </div>
                 </div>
-                <!-- <i class="fas fa-ellipsis-h post-more"></i> -->
-            </div>
-            <div class="post-content">
-                <p><?= htmlspecialchars($post['content'] ?? 'Nouveau sur BBLove !') ?></p>
-            </div>
-            <?php if(!empty($post['image'])): ?>
-            <img src="./uploads/<?= $post['image'] ?>" alt="Post" class="post-image">
-            <?php endif; ?>
-            <!-- <div class="post-actions">
-                <div class="post-action">
-                    <i class="far fa-heart"></i>
-                    <span>J'aime</span>
-                </div>
-                <div class="post-action">
-                    <i class="fas fa-comment"></i>
-                    <span>Commenter</span>
-                </div>
-                <div class="post-action">
-                    <i class="fas fa-share"></i>
-                    <span>Partager</span>
-                </div>
-            </div> -->
-            <!-- <div class="post-comments">
-                <p><?= $post['likes'] ?? 0 ?> personnes ont liké · <?= $post['commentaires'] ?? 0 ?> commentaires</p>
-            </div> -->
+                <?php endif; ?>
+            <?php endforeach; ?>
         </div>
-        <?php endforeach; ?>
     </div>
 
     <!-- Floating Action Button -->
-     <a href="users/posts.php">
+    <a href="posts.php">
         <div class="fab">
             <i class="fas fa-plus"></i>
         </div>
-     </a>
+    </a>
 
     <!-- Bottom Navigation -->
     <div class="bottom-nav">
-        <a href="#" class="nav-item active">
+        <a href="./../dashboard.php" class="nav-item active">
             <i class="fas fa-home"></i>
             <span>Accueil</span>
         </a>
-        <a href="users/decouvrir.php" class="nav-item">
+        <a href="decouvrir.php" class="nav-item">
             <i class="fas fa-search"></i>
             <span>Découvrir</span>
         </a>
@@ -432,12 +519,12 @@ $allPosts = $stmt->fetchAll();
             <i class="fa-solid fa-bars"></i>
             <span>Rencontres</span>
         </a>
-        <a href="users/recuperer_user.php" class="nav-item">
+        <a href="recuperer_user.php" class="nav-item">
             <i class="fas fa-comment-dots"></i>
             <span>Messages</span>
             <!-- <div class="nav-notification">3</div> -->
         </a>
-        <a href="users/new_profil.php?user_id=<?= htmlspecialchars($userId) ?>" class="nav-item">
+        <a href="new_profil.php?user_id=<?= htmlspecialchars($userId) ?>" class="nav-item">
           <i class="fas fa-user"></i>
           <span>Profil</span>
         </a>
@@ -453,7 +540,7 @@ $allPosts = $stmt->fetchAll();
                         icon.classList.remove('far');
                         icon.classList.add('fas');
                         this.classList.add('post-liked');
-    } else {
+                    } else {
                         icon.classList.remove('fas');
                         icon.classList.add('far');
                         this.classList.remove('post-liked');
@@ -485,6 +572,6 @@ $allPosts = $stmt->fetchAll();
                 console.log('Load more posts...');
             }
         });
-</script>
+    </script>
 </body>
 </html>
