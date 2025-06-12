@@ -628,7 +628,7 @@ $getUser = $getUser->fetch();
     <!-- Informations utilisateur -->
     <div class="profile-info">
         <h1><?= htmlspecialchars($getUser['nom']) ?></h1>
-        <p class="profile-bio"><?= htmlspecialchars($getUser['description'] ?? 'Nouveau sur BBLove !') ?></p>
+        <p class="profile-bio"><?= htmlspecialchars($getUser['description_partenaire'] ?? 'Nouveau sur BBLove !') ?></p>
         <div class="profile-details">
             <p><i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($getUser['ville'] ?? 'Non spécifié') ?></p>
             <p><i class="fas fa-heart"></i> <?= htmlspecialchars($getUser['situation_amoureuse'] ?? 'Non spécifié') ?></p>

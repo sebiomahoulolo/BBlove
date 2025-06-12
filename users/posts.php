@@ -327,7 +327,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 <img src="<?= !empty($getUser['profile_picture']) ? '../uploads/' . $getUser['profile_picture'] : 'https://randomuser.me/api/portraits/women/44.jpg' ?>" alt="Profil" class="user-avatar">
                 <div class="post-input-container">
-                    <textarea name="content" class="post-input" placeholder="À quoi pensez-vous ?" required></textarea>
+                    <textarea name="content" class="post-input" placeholder="À quoi pensez-vous ?" required maxlength="500"></textarea>
                     <div class="emoji-picker" title="Émojis">
                         <i class="far fa-smile"></i>
                     </div>

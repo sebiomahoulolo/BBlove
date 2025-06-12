@@ -473,7 +473,7 @@ $stmt->execute([$userId]);
                 <?php if($user['id'] != $userId): ?>
                 <div class="user-card">
                     <div class="user-card-header">
-                        <img src="<?= !empty($user['photo']) ? $user['photo'] : 'https://randomuser.me/api/portraits/men/1.jpg' ?>" 
+                        <img src="<?= !empty($user['photo']) ? $user['photo'] : '../img/Profile.webp' ?>" 
                              alt="Profil" 
                              class="user-card-avatar">
                         <div class="user-card-info">
@@ -482,6 +482,7 @@ $stmt->execute([$userId]);
                             <p class="user-card-location"><?= htmlspecialchars($user['ville'] ?? '') ?></p>
                         </div>
                     </div>
+                    <p class="user-card-location" style="padding-left: 20px ; padding-right: 20px; margin-bottom: 10px; color: var(--dark-gray); font-size: 0.9rem;"><?= htmlspecialchars($user['description_partenaire'] ?? '') ?></p>
                     <div class="user-card-actions">
                         <a href="new_profil.php?user_id=<?= $user[0] ?>" class="user-card-btn view-btn">
                             <i class="fas fa-user"></i>

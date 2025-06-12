@@ -145,8 +145,6 @@ usort($suggestions, fn($a, $b) => $b['score'] <=> $a['score']);
                 <a href="dashboard.php?page=voireprofil&id=<?= $profil['user_id'] ?>" class="btn btn-outline-danger btn-sm">Voir le profil</a>
                 <a href="dashboard.php?page=messages&to=<?= $profil['user_id'] ?>" class="btn btn-danger btn-sm">Message</a>
                 <a href="voir_galerie.php?id=<?= $profil['user_id'] ?>" class="btn btn-outline-primary btn-sm">Voir la galerie</a>
-
-
          </div>
 
       </div>

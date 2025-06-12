@@ -28,9 +28,11 @@ $stmt = $pdo->prepare("
     SELECT u.*, p.* 
     FROM users u
     LEFT JOIN profils p ON u.id = p.user_id 
-    ORDER BY u.id
+    WHERE u.id != ?
+    AND TIMESTAMPDIFF(MINUTE, u.last_activity, NOW()) <= 10
+    ORDER BY u.id DESC
 ");
-$stmt->execute();
+$stmt->execute([$userId]);
 $allUsers = $stmt->fetchAll();
 // var_dump($allUsers);
 
@@ -353,7 +355,7 @@ $allPosts = $stmt->fetchAll();
     <!-- Stories -->
     <div class="stories">
         <div class="story">
-            <img src="<?= !empty($currentUser['photo']) ? $currentUser['photo'] : 'https://randomuser.me/api/portraits/women/1.jpg' ?>" alt="Story" class="story-avatar">
+            <img src="<?= !empty($currentUser['photo']) ? $currentUser['photo'] : 'img/Profile.webp' ?>" alt="Story" class="story-avatar">
             <div class="story-add">+</div>
             <div class="story-username"><?= htmlspecialchars($currentUser['nom']) ?></div>
         </div>
@@ -361,7 +363,7 @@ $allPosts = $stmt->fetchAll();
             <?php if($user['id'] != $userId): ?>
             <div class="story">
               <a href="users/new_profil.php?user_id=<?= $user[0] ?>">
-                <img src="<?= !empty($user['photo']) ? $user['photo'] : 'https://randomuser.me/api/portraits/men/1.jpg' ?>" alt="Story" class="story-avatar">
+                <img src="<?= !empty($user['photo']) ? $user['photo'] : 'img/Profile.webp' ?>" alt="Story" class="story-avatar">
                 <div class="story-username"><?= htmlspecialchars($user['nom']) ?></div>
               </a>
             </div>

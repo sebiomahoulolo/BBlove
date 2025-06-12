@@ -309,9 +309,6 @@ $messages = $stmt->fetchAll();
                 }else if ( $exist_msg["destinataire_id"] == $userId && $exist_msg["expediteur_id"] == $otherUserId) {
                     ?>
                         <div class="message others_message">
-                            <div class="autre_message_info">
-                                <p><?= $exist_msg['contenu'] ?></p>
-                            </div>
                             <p><?= $exist_msg['contenu'] ?></p>
                             <p class="date"><?= $exist_msg['date_envoi'] ?></p>
                         </div>
