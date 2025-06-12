@@ -231,7 +231,7 @@ $stmt->execute([$userId]);
         <?php else: ?>
             <?php foreach ($users as $user): ?>
                 <a href="chat.php?user_id=<?= $user['id'] ?>" class="message-item">
-                    <img src="<?= !empty($user['photo']) ? $user['photo'] : 'https://randomuser.me/api/portraits/men/1.jpg' ?>" 
+                    <img src="<?= !empty($user['photo']) ? $user['photo'] : '../img/Profile.webp' ?>" 
                          alt="Profil" 
                          class="message-avatar">
                     <div class="message-content">

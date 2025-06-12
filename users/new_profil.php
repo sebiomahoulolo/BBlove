@@ -606,7 +606,11 @@ $getUser = $getUser->fetch();
 <body>
     <!-- Barre de navigation supérieure -->
     <header class="header">
+        <div class="logo">
         <a href="./../dashboard.php" class="back-button"><i class="fas fa-arrow-left"></i></a>
+            <i class="fas fa-heart"></i>
+            <span>BBLove</span>
+        </div>
         <div class="profile-header-title">Profil</div>
         <!-- <div class="header-icons">
             <i class="fas fa-search"></i>
@@ -615,18 +619,29 @@ $getUser = $getUser->fetch();
     </header>
 
     <!-- Bannière de profil -->
-    <div class="profile-banner">
-        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Bannière" class="banner-image">
-        <div class="profile-picture-container">
-            <img src="<?= !empty($getUser['photo']) ? $getUser['photo'] : 'https://randomuser.me/api/portraits/women/44.jpg' ?>" alt="Profil" class="profile-picture">
-            <?php if($userId == $getUserId): ?>
-            <button class="edit-profile-btn"><i class="fas fa-camera"></i></button>
-            <?php endif; ?>
+    <div class="position-relative overflow-hidden" style="min-height: 100px;">
+        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" 
+             alt="Bannière" 
+             class="w-100 h-100 object-fit-cover">
+        <div class="position-absolute" style="bottom: -50px; left: 20px;">
+            <div class="position-relative">
+                <img src="<?= !empty($getUser['photo']) ? $getUser['photo'] : 'https://randomuser.me/api/portraits/women/44.jpg' ?>" 
+                     alt="Profil" 
+                     class="rounded-circle border border-white"
+                     style="width: 100px; height: 100px; object-fit: cover;">
+                <?php if($userId == $getUserId): ?>
+                    <button class="position-absolute btn btn-primary rounded-circle p-2" 
+                            style="bottom: 5px; right: 5px; width: 30px; height: 30px;"
+                            onclick="document.getElementById('photo').click()">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 
     <!-- Informations utilisateur -->
-    <div class="profile-info">
+    <div class="profile-info mt-5 pt-4">
         <h1><?= htmlspecialchars($getUser['nom']) ?></h1>
         <p class="profile-bio"><?= htmlspecialchars($getUser['description_partenaire'] ?? 'Nouveau sur BBLove !') ?></p>
         <div class="profile-details">
@@ -642,14 +657,15 @@ $getUser = $getUser->fetch();
             <?php endif; ?>
         </div>
     </div>
+    
 
     <!-- Navigation du profil -->
-    <!-- <nav class="profile-nav">
-        <a href="#" class="active">Publications</a>
-        <a href="#">Photos</a>
+    <nav class="profile-nav">
+        <a href="consulter_posts.php" class="active">Consulter mes postes</a>
+        <!-- <a href="#">Photos</a>
         <a href="#">Amis</a>
-        <a href="#">Infos</a>
-    </nav> -->
+        <a href="#">Infos</a> -->
+    </nav>
 
     <!-- Contenu du profil -->
     <div class="profile-content">

@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db.php';
+include '../db.php';
 
 // Vérification de session utilisateur
 if (!isset($_SESSION['user_id'])) {
@@ -36,16 +36,16 @@ $stmt->execute([$userId]);
 $allUsers = $stmt->fetchAll();
 // var_dump($allUsers);
 
-// Récupération de tous les posts avec les informations des utilisateurs
+// Récupération des posts de l'utilisateur connecté
 $stmt = $pdo->prepare("
     SELECT p.*, u.nom, pr.photo, pr.age, pr.ville
     FROM posts p
     JOIN users u ON p.user_id = u.id
     LEFT JOIN profils pr ON u.id = pr.user_id
-    WHERE p.created_at >= NOW() - INTERVAL 14 DAY
+    WHERE p.user_id = ?
     ORDER BY p.created_at DESC
 ");
-$stmt->execute();
+$stmt->execute([$userId]);
 $allPosts = $stmt->fetchAll();
 
 
@@ -345,76 +345,17 @@ $allPosts = $stmt->fetchAll();
     <!-- Header -->
     <div class="header">
         <div class="logo">
+        <a href="./../dashboard.php" class="back-button"><i class="fas fa-arrow-left"></i></a>
             <i class="fas fa-heart"></i>
             <span>BBLove</span>
         </div>
         <div class="header-icons">
+            <span style="font-size: 1rem; font-weight: bold; color: black;"  >Consulter mes postes</span>
             <!-- <i class="fas fa-search header-icon"></i> -->
-            <i class="fas fa-comment-dots header-icon"></i>
+            <!-- <i class="fas fa-comment-dots header-icon"></i> -->
         </div>
     </div>
 
-    <!-- Stories -->
-    <div class="stories">
-        <div class="story">
-            <img src="<?= !empty($currentUser['photo']) ? $currentUser['photo'] : 'img/Profile.webp' ?>" alt="Story" class="story-avatar">
-            <div class="story-add">+</div>
-            <div class="story-username"><?= htmlspecialchars($currentUser['nom']) ?></div>
-        </div>
-        <?php foreach($allUsers as $user): ?>
-            <?php if($user['id'] != $userId): ?>
-            <div class="story">
-              <a href="users/new_profil.php?user_id=<?= $user[0] ?>">
-                <img src="<?= !empty($user['photo']) ? $user['photo'] : 'img/Profile.webp' ?>" alt="Story" class="story-avatar">
-                <div class="story-username"><?= htmlspecialchars($user['nom']) ?></div>
-              </a>
-            </div>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    </div>
-
-    <!-- Posts -->
-    <div class="posts">
-        <?php foreach($allPosts as $post): ?>
-        <div class="post">
-            <div class="post-header">
-                <div class="post-user">
-                    <img src="<?= !empty($post['photo']) ? $post['photo'] : './img/Profile.webp' ?>" alt="User" class="post-avatar">
-                    <a class="text-decoration-none" style="text-decoration: none;" href="users/new_profil.php?user_id=<?= $post['user_id'] ?>"><div class="post-info ">
-                        <h4><?= htmlspecialchars($post['nom']) ?></h4>
-                        <p><?= htmlspecialchars($post['age'] ?? '') ?> ans · <?= htmlspecialchars($post['ville'] ?? '') ?></p>
-                        <p><?= htmlspecialchars($post['created_at'] ?? '') ?></p>
-                    </div>
-                    </a>
-                </div>
-                <!-- <i class="fas fa-ellipsis-h post-more"></i> -->
-            </div>
-            <div class="post-content">
-                <p><?= htmlspecialchars($post['content'] ?? 'Nouveau sur BBLove !') ?></p>
-            </div>
-            <?php if(!empty($post['image'])): ?>
-            <img src="./uploads/<?= $post['image'] ?>" alt="Post" class="post-image">
-            <?php endif; ?>
-            <!-- <div class="post-actions">
-                <div class="post-action">
-                    <i class="far fa-heart"></i>
-                    <span>J'aime</span>
-                </div>
-                <div class="post-action">
-                    <i class="fas fa-comment"></i>
-                    <span>Commenter</span>
-                </div>
-                <div class="post-action">
-                    <i class="fas fa-share"></i>
-                    <span>Partager</span>
-                </div>
-            </div> -->
-            <!-- <div class="post-comments">
-                <p><?= $post['likes'] ?? 0 ?> personnes ont liké · <?= $post['commentaires'] ?? 0 ?> commentaires</p>
-            </div> -->
-        </div>
-        <?php endforeach; ?>
-    </div>
 
     <!-- Floating Action Button -->
      <a href="users/posts.php">
@@ -448,7 +389,56 @@ $allPosts = $stmt->fetchAll();
         </a>
     </div>
 
-    <script>
+
+
+<!-- Posts -->
+<div class="posts">
+    <?php if (empty($allPosts)): ?>
+        <div class="no-posts">
+            <p>Vous n'avez pas encore de posts</p>
+            <a href="posts.php" class="create-post-btn">Créer un post</a>
+        </div>
+    <?php else: ?>
+        <?php foreach ($allPosts as $post): ?>
+            <div class="post">
+                <div class="post-header">
+                    <div class="post-user">
+                        <img src="<?= !empty($post['photo']) ? $post['photo'] : 'https://randomuser.me/api/portraits/men/1.jpg' ?>" 
+                             alt="Profil" 
+                             class="post-avatar">
+                        <div class="post-info">
+                            <h4><?= htmlspecialchars($post['nom']) ?></h4>
+                            <p><?= date('d/m/Y H:i', strtotime($post['created_at'])) ?></p>
+                        </div>
+                    </div>
+                    <!-- <i class="fas fa-ellipsis-h post-more"></i> -->
+                </div>
+                <div class="post-content">
+                    <p><?= nl2br(htmlspecialchars($post['content'])) ?></p>
+                    <?php if (!empty($post['image'])): ?>
+                        <img src="<?= '../uploads/' . $post['image'] ?>" alt="Post image" class="post-image">
+                    <?php endif; ?>
+                </div>
+                <!-- <div class="post-actions">
+                    <div class="post-action">
+                        <i class="far fa-heart"></i>
+                        <span>J'aime</span>
+                    </div>
+                    <div class="post-action">
+                        <i class="far fa-comment"></i>
+                        <span>Commenter</span>
+                    </div>
+                    <div class="post-action">
+                        <i class="far fa-share-square"></i>
+                        <span>Partager</span>
+                    </div>
+                </div> -->
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>
+
+<script>
         // Like functionality
         document.querySelectorAll('.post-action').forEach(action => {
             action.addEventListener('click', function() {
@@ -458,7 +448,7 @@ $allPosts = $stmt->fetchAll();
                         icon.classList.remove('far');
                         icon.classList.add('fas');
                         this.classList.add('post-liked');
-    } else {
+        } else {
                         icon.classList.remove('fas');
                         icon.classList.add('far');
                         this.classList.remove('post-liked');

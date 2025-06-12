@@ -279,7 +279,7 @@ $messages = $stmt->fetchAll();
             <i class="fas fa-arrow-left"></i>
         </a>
         <div class="user-info">
-            <img src="<?= !empty($otherUser['profile_picture']) ? '../uploads/' . $otherUser['profile_picture'] : 'https://randomuser.me/api/portraits/women/44.jpg' ?>" 
+            <img src="<?= !empty($otherUser['profile_picture']) ? '../uploads/' . $otherUser['profile_picture'] : '../img/Profile.webp' ?>" 
                  alt="Profil" 
                  class="user-avatar">
             <div>
